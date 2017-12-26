@@ -17,11 +17,40 @@ app.get('/', function(request, response) {
 	});
 });
 
-app.get('/toto', function(request, response) {
+app.get('/desc', function(request, response) {
 
 	pg.connect(connString, function(err, client, done) {
 		if(err) response.send("Could not connect to DB: " + err);
 		client.query('SELECT * FROM public."MyTable" ORDER BY id DESC', function(err, result) {
+			done();
+			if(err) return response.send(err);
+			response.send(result.rows);
+		});
+	});
+});
+
+
+// "MyTable - All" request
+app.get('/MyTable/All', function(request, response) {
+	console.log("MyTable - All request:" +  + request);
+	
+	pg.connect(connString, function(err, client, done) {
+		if(err) response.send("Could not connect to DB: " + err);
+		client.query('SELECT * FROM public."MyTable" ORDER BY id ASC', function(err, result) {
+			done();
+			if(err) return response.send(err);
+			response.send(result.rows);
+		});
+	});
+});
+
+// "MyTable - Related to a specific Id" request
+app.get('/MyTable', function(request, response) {
+	console.log("MyTable - Related to a specific Id request:" + request.query.id);
+
+	pg.connect(connString, function(err, client, done) {
+		if(err) response.send("Could not connect to DB: " + err);
+		client.query('SELECT * FROM public."MyTable" WHERE Id=' + request.query.id + ' ORDER BY id DESC', function(err, result) {
 			done();
 			if(err) return response.send(err);
 			response.send(result.rows);
